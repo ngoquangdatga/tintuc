@@ -1,0 +1,39 @@
+version: "3.8"
+services:
+  app:
+    container_name: app
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/var/www/html
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "8089:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/:/etc/nginx/conf.d/
+     
+    depends_on:
+      - db
+      - app
+
+  db:
+    image: mysql:5.7
+    # container_name: mysql_app
+    environment:
+      MYSQL_DATABASE: Laravel
+      MYSQL_ROOT_PASSWORD: 123456 
+    volumes:
+      - type: volume
+        source: mysql_volume
+        # target: ./mysql:/var/lib/mysql
+        target: /var/lib/mysql
+    ports:
+      - 3399:3306
+
+volumes:
+  mysql_volume:
